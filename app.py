@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import os
-import fitz
+import fitz  # PyMuPDF
 
 # Configura tu clave API de Cohere
 API_KEY  = os.environ["COHERE_API_KEY"]
@@ -18,14 +18,15 @@ def send_message(message, context):
     data = {
         'preamble': "responde siempre de manera divertida y con emojis",
         'message': f"{context}\n\nPregunta: {message}",
-        'model': 'command-r-plus' 
+        'model': 'command-r-plus'
     }
     response = requests.post(COHERE_API_URL, headers=headers, json=data)
     return response.json()
 
 # Función para extraer texto del PDF
-def extract_text_from_pdf(pdf_path):
-    doc = fitz.open(pdf_path)
+def extract_text_from_pdf(file):
+    # Abre el archivo PDF desde un objeto BytesIO
+    doc = fitz.open(stream=file, filetype="pdf")
     text = ""
     for page in doc:
         text += page.get_text()
@@ -50,4 +51,3 @@ if uploaded_file:
                 st.write('No se recibió una respuesta válida.')
 else:
     st.write('Por favor, sube un archivo PDF.')
-
